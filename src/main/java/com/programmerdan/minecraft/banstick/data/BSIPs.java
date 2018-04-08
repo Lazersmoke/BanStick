@@ -96,7 +96,7 @@ public class BSIPs {
 					"SELECT DISTINCT i.iid FROM bs_ip i JOIN bs_session s ON i.iid = s.iid WHERE s.pid = ? ORDER BY s.join_time;");) {
 				// TODO: replace statement w/ view.
 			getIDs.setLong(1, forPlayer.getId());
-			BanStick.getPlugin().debug("Filling IPs for {0}", forPlayer.getUUID());
+			BanStick.getPlugin().getLogger().warning("Filling IPs for " + forPlayer.getUUID());
 			try (ResultSet rs = getIDs.executeQuery()) {
 				while (rs.next()) {
 					Long id = rs.getLong(1);
@@ -105,11 +105,11 @@ public class BSIPs {
 					}
 				}
 				if (ipList.size() == 0 || ipSet.size() == 0) {
-					BanStick.getPlugin().warning("No IPs for " + forPlayer.getName());
+					BanStick.getPlugin().getLogger().warning("No IPs for " + forPlayer.getName());
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to get list of IP ids", se);
+			BanStick.getPlugin().getLogger().severe("Failed to get list of IP ids" + se);
 		}
 	}
 	

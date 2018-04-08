@@ -9,17 +9,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
-
 import com.programmerdan.minecraft.banstick.BanStick;
 import com.programmerdan.minecraft.banstick.data.BSBan;
 import com.programmerdan.minecraft.banstick.data.BSIP;
 import com.programmerdan.minecraft.banstick.data.BSIPData;
 
 import inet.ipaddr.IPAddressString;
+
+import net.md_5.bungee.config.Configuration;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 public class BanStickTorUpdater {
 	
@@ -42,9 +40,9 @@ tor:
 	private boolean banNewNodes = false;
 	
 	private List<TorList> torLists = new ArrayList<TorList>();
-	private List<BukkitTask> torListUpdaters = new ArrayList<BukkitTask>();
+	private List<ScheduledTask> torListUpdaters = new ArrayList<ScheduledTask>();
 
-	public BanStickTorUpdater(FileConfiguration config) {
+	public BanStickTorUpdater(Configuration config) {
 		if (!configureTor(config.getConfigurationSection("tor"))) {
 			return;
 		}
@@ -52,7 +50,7 @@ tor:
 		activateTor();
 	}
 	
-	private boolean configureTor(ConfigurationSection config) {
+	private boolean configureTor(Configuration config) {
 		if (config == null || !config.getBoolean("check", false)) {
 			BanStick.getPlugin().info("TOR exit node checks disabled.");
 			return false;
@@ -60,9 +58,9 @@ tor:
 		
 		try {
 			banNewNodes = config.getBoolean("autoban", false);
-			ConfigurationSection lists = config.getConfigurationSection("lists");
+			Configuration lists = config.getConfigurationSection("lists");
 			for (String listName : lists.getKeys(false)) {
-				ConfigurationSection list = lists.getConfigurationSection(listName);
+				Configuration list = lists.getConfigurationSection(listName);
 				
 				torLists.add(new TorList(
 							list.getString("address"),
@@ -83,7 +81,7 @@ tor:
 	private void activateTor() {
 		for (TorList tor : torLists) {
 			BanStick.getPlugin().info("Preparing Tor runnable for " + tor.address);
-			BukkitRunnable run = new BukkitRunnable() {
+			Runnable run = new Runnable() {
 				final TorList torSave = tor;
 				@Override
 				public void run() {
@@ -169,7 +167,7 @@ tor:
 	
 	public void shutdown() {
 		if (torListUpdaters == null) return;
-		for (BukkitTask task : torListUpdaters) {
+		for (ScheduledTask task : torListUpdaters) {
 			try {
 				task.cancel();
 			} catch (Exception e) {}

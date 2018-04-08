@@ -1,8 +1,5 @@
 package com.programmerdan.minecraft.banstick.commands;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.programmerdan.minecraft.banstick.BanStick;
 import com.programmerdan.minecraft.banstick.containers.BanResult;
 import com.programmerdan.minecraft.banstick.data.BSIP;
@@ -23,12 +20,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-
-import vg.civcraft.mc.namelayer.NameAPI;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 /**
  * Always finish with a DoubleTap to the head -- handles manually unpardoning and perhaps banning nerds who multiaccount
@@ -85,7 +78,7 @@ public class DoubleTapCommand implements CommandExecutor {
 		Date banEnd = null;
 		int mStart = 1 + offset;
 
-		BanStick.getPlugin().debug("preBan: {0}, doBan? {1}, toBan: {2}, sDoBan? {3}, sBan: {4}, endDate: {5}, endTime: {6}", 
+		BanStick.getPlugin().getLogger().debug("preBan: {0}, doBan? {1}, toBan: {2}, sDoBan? {3}, sBan: {4}, endDate: {5}, endTime: {6}", 
 				preBan, doBan, toBan, secondDoBan, secondBan, endDate, endTime);
 		
 		if (endDate != null) {
@@ -110,7 +103,7 @@ public class DoubleTapCommand implements CommandExecutor {
 		
 		String message = (arguments.length >= mStart ? String.join(" ", Arrays.copyOfRange(arguments, mStart, arguments.length)) : null);
 		
-		BanStick.getPlugin().debug("message: {0}", message);
+		BanStick.getPlugin().getLogger().warning("message: " + message);
 		
 		if (ipcheck != null) {
 			if (!sender.hasPermission("banstick.ips")) {
@@ -163,7 +156,7 @@ public class DoubleTapCommand implements CommandExecutor {
 					} catch (NoClassDefFoundError ncde) { }
 					
 					if (playerId == null) {
-						Player match = Bukkit.getPlayer(toBan);
+						ProxiedPlayer match = BanStick.getPlugin().getProxy().getPlayer(toBan);
 						if (match != null) {
 							playerId = match.getUniqueId();
 						}
@@ -194,7 +187,7 @@ public class DoubleTapCommand implements CommandExecutor {
 					} catch (NoClassDefFoundError ncde) { }
 					
 					if (secondPlayerId == null) {
-						Player match = Bukkit.getPlayer(secondBan);
+						ProxiedPlayer match = BanStick.getPlugin().getProxy().getPlayer(secondBan);
 						if (match != null) {
 							secondPlayerId = match.getUniqueId();
 						}

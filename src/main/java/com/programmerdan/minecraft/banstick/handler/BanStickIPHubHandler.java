@@ -16,12 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.programmerdan.minecraft.banstick.BanStick;
@@ -33,6 +27,9 @@ import com.programmerdan.minecraft.banstick.data.BSSession;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 
+import net.md_5.bungee.api.scheduler.ScheduledTask;
+import net.md_5.bungee.config.Configuration;
+
 /**
  * This class deals with scheduling a constrained lookup / update of data from IP proxy data key-locked services.
  * 
@@ -43,8 +40,8 @@ import inet.ipaddr.IPAddressString;
  * @author ProgrammerDan
  *
  */
-public class BanStickIPHubHandler extends BukkitRunnable {
-	private BukkitTask selfTask;
+public class BanStickIPHubHandler implements Runnable {
+	private ScheduledTask selfTask;
 	private ConcurrentLinkedQueue<WeakReference<BSIP>> toCheck = null;
 	private boolean enabled = false;
 	
@@ -57,7 +54,7 @@ public class BanStickIPHubHandler extends BukkitRunnable {
 	
 	private final String target = "http://v2.api.iphub.info/ip/";
 	
-	public BanStickIPHubHandler(FileConfiguration config) {
+	public BanStickIPHubHandler(Configuration config) {
 		if (!configure(config.getConfigurationSection("iphub"))) {
 			BanStick.getPlugin().warning("IP Hub Proxy (iphub.info) lookup is disabled. This will reduce the quality of information on player's connections.");
 			return;
@@ -65,7 +62,7 @@ public class BanStickIPHubHandler extends BukkitRunnable {
 		
 		begin();
 	}
-	private boolean configure(ConfigurationSection config) {
+	private boolean configure(Configuration config) {
 		if (config != null && config.getBoolean("enable", false)) {
 			enabled = true;
 		} else {

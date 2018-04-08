@@ -4,18 +4,16 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 
-
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.scheduler.BukkitTask;
-
 import com.google.common.reflect.ClassPath;
 import com.programmerdan.minecraft.banstick.BanStick;
+
+import net.md_5.bungee.config.Configuration;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 public class BanStickProxyHandler {
 
 	ArrayList<ProxyLoader> loaders;
-	ArrayList<BukkitTask> loaderTasks;
+	ArrayList<ScheduledTask> loaderTasks;
 	
 	public BanStickProxyHandler(FileConfiguration config, ClassLoader classes) {
 		setup(config.getConfigurationSection("proxy"), classes);
@@ -28,7 +26,7 @@ public class BanStickProxyHandler {
 		}
 		
 		loaders = new ArrayList<ProxyLoader>();
-		loaderTasks = new ArrayList<BukkitTask>();
+		loaderTasks = new ArrayList<ScheduledTask>();
 		
 		
 		// now load all configured proxy list loaders.
@@ -39,7 +37,7 @@ public class BanStickProxyHandler {
 
 			for (ClassPath.ClassInfo clsInfo : getSamplersPath.getTopLevelClasses("com.programmerdan.minecraft.banstick.proxy")) {
 				Class<?> clazz = clsInfo.load();
-				BanStick.getPlugin().info("Found a proxy loader class {0}, attempting to find a suitable constructor", clazz.getName());
+				BanStick.getPlugin().getLogger().info("Found a proxy loader class {0}, attempting to find a suitable constructor", clazz.getName());
 				if (clazz != null && ProxyLoader.class.isAssignableFrom(clazz)) {
 					ProxyLoader loader = null;
 					try {
@@ -54,7 +52,7 @@ public class BanStickProxyHandler {
 
 					if (loader != null) {
 						try {
-							BukkitTask loaderTask = loader.runTaskTimerAsynchronously(BanStick.getPlugin(), loader.getDelay(), loader.getPeriod());
+							ScheduledTask loaderTask = loader.runTaskTimerAsynchronously(BanStick.getPlugin(), loader.getDelay(), loader.getPeriod());
 							loaderTasks.add(loaderTask);
 						} catch (Exception e) {
 							BanStick.getPlugin().warning("Failed to activate proxy loader of type {0}", clazz.getName());
@@ -70,7 +68,7 @@ public class BanStickProxyHandler {
 	
 	public void shutdown() {
 		if (loaderTasks == null) return;
-		for (BukkitTask task : loaderTasks) {
+		for (ScheduledTask task : loaderTasks) {
 			try {
 				task.cancel();
 			} catch (Exception e) {}

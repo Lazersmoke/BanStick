@@ -97,9 +97,9 @@ public class BSSession {
 				if (batchSize > 0 && batchSize % 100 == 0) {
 					int[] batchRun = save.executeBatch();
 					if (batchRun.length != batchSize) {
-						BanStick.getPlugin().severe("Some elements of the dirty batch didn't save? " + batchSize + " vs " + batchRun.length);
+						BanStick.getPlugin().getLogger().severe("Some elements of the dirty batch didn't save? " + batchSize + " vs " + batchRun.length);
 					} else {
-						BanStick.getPlugin().debug("Session batch: {0} saves", batchRun.length);
+						BanStick.getPlugin().getLogger().warning("Session batch: " + batchRun.length + " saves");
 					}
 					batchSize = 0;
 				}
@@ -107,13 +107,13 @@ public class BSSession {
 			if (batchSize > 0 && batchSize % 100 > 0) {
 				int[] batchRun = save.executeBatch();
 				if (batchRun.length != batchSize) {
-					BanStick.getPlugin().severe("Some elements of the dirty batch didn't save? " + batchSize + " vs " + batchRun.length);
+					BanStick.getPlugin().getLogger().severe("Some elements of the dirty batch didn't save? " + batchSize + " vs " + batchRun.length);
 				} else {
-					BanStick.getPlugin().debug("Session batch: {0} saves", batchRun.length);
+					BanStick.getPlugin().getLogger().warning("Session batch: " + batchRun.length + " saves");
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Save of BSSession dirty batch failed!: ", se);
+			BanStick.getPlugin().getLogger().severe("Save of BSSession dirty batch failed!: " + se);
 		}
 	}
 	
@@ -128,10 +128,10 @@ public class BSSession {
 			saveToStatement(save);
 			int effects = save.executeUpdate();
 			if (effects == 0) {
-				BanStick.getPlugin().severe("Failed to save BSSession or no update? " + this.sid);
+				BanStick.getPlugin().getLogger().severe("Failed to save BSSession or no update? " + this.sid);
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Save of BSSession failed!: ", se);
+			BanStick.getPlugin().getLogger().severe("Save of BSSession failed!: " + se);
 		}
 	}
 	
@@ -171,11 +171,11 @@ public class BSSession {
 					allSessionID.put(sid, nS);
 					return nS;
 				} else {
-					BanStick.getPlugin().warning("Failed to retrieve Session by id: " + sid + " - not found");
+					BanStick.getPlugin().getLogger().warning("Failed to retrieve Session by id: " + sid + " - not found");
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Retrieval of session by ID failed: " + sid, se);
+			BanStick.getPlugin().getLogger().severe("Retrieval of session by ID failed: " + sid + se);
 		}
 		return null;
 	}
@@ -216,7 +216,7 @@ public class BSSession {
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Retrieval of sessions by IP failed: " + iid.toString(), se);
+			BanStick.getPlugin().getLogger().severe("Retrieval of sessions by IP failed: " + iid.toString() + se);
 		}
 		return sessions;
 	}
@@ -237,7 +237,7 @@ public class BSSession {
 			newSession.setLong(3,  iid.getId());
 			int ins = newSession.executeUpdate();
 			if (ins < 1) {
-				BanStick.getPlugin().warning("Insert reported no session inserted?" + pid.getName());
+				BanStick.getPlugin().getLogger().warning("Insert reported no session inserted?" + pid.getName());
 			}
 		
 			try (ResultSet rs = newSession.getGeneratedKeys()) {
@@ -248,12 +248,12 @@ public class BSSession {
 					allSessionID.put(sid, session);
 					return session;
 				} else {
-					BanStick.getPlugin().severe("Failed to get ID from inserted session!? " + pid.getName());
+					BanStick.getPlugin().getLogger().severe("Failed to get ID from inserted session!? " + pid.getName());
 					return null;
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to insert new session for " + pid.getName(), se);
+			BanStick.getPlugin().getLogger().severe("Failed to insert new session for " + pid.getName() + se);
 		}
 		return null;
 	}
@@ -295,7 +295,7 @@ public class BSSession {
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed during Session preload, offset " + offset + " limit " + limit, se);
+			BanStick.getPlugin().getLogger().severe("Failed during Session preload, offset " + offset + " limit " + limit + se);
 		}
 		return maxId;
 	}

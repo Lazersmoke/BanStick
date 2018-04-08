@@ -5,9 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import com.programmerdan.minecraft.banstick.BanStick;
 import com.programmerdan.minecraft.banstick.containers.BanResult;
 import com.programmerdan.minecraft.banstick.data.BSBan;
@@ -16,7 +13,8 @@ import com.programmerdan.minecraft.banstick.data.BSPlayer;
 import com.programmerdan.minecraft.banstick.data.BSSession;
 import com.programmerdan.minecraft.banstick.data.BSShare;
 
-import vg.civcraft.mc.namelayer.NameAPI;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.ChatColor;
 
 /**
  * A series of static utility classes to facilitate issuing bans.
@@ -111,7 +109,7 @@ public class BanHandler {
 			if (message == null || message.trim().equals("")) {
 				message = adminBan ? "Administrative Ban" : "Automatic Ban"; // TODO: config!
 			}
-			Player spigotPlayer = Bukkit.getPlayer(playerId);
+			ProxiedPlayer spigotPlayer = BanStick.getPlugin().getProxy().getPlayer(playerId);
 			BSPlayer player = BSPlayer.byUUID(playerId);
 			if (player == null) {
 				if (spigotPlayer != null) {
@@ -130,9 +128,9 @@ public class BanHandler {
 			
 			if (spigotPlayer != null) {
 				if (banEnd != null) {
-					spigotPlayer.kickPlayer(message + ". Ends " + BanHandler.endTimeFormat.format(banEnd));
+					spigotPlayer.disconnect(message + ". Ends " + BanHandler.endTimeFormat.format(banEnd));
 				} else {
-					spigotPlayer.kickPlayer(message);
+					spigotPlayer.disconnect(message);
 				}
 			}
 			
@@ -140,7 +138,7 @@ public class BanHandler {
 			result.addPlayer(player);
 			return result;
 		} catch (Exception e) {
-			BanStick.getPlugin().warning("Failed to issue UUID ban: ", e);
+			BanStick.getPlugin().getLogger().warning("Failed to issue UUID ban: " + e);
 			return new BanResult();
 		}
 	}
@@ -173,7 +171,7 @@ public class BanHandler {
 			BanResult result = new BanResult();
 			result.addBan(ban);
 			
-			for (Player player : Bukkit.getOnlinePlayers()) {
+			for (ProxiedPlayer player : BanStick.getPlugin().getProxy().getPlayers()) {
 				BSPlayer banPlayer = BSPlayer.byUUID(player.getUniqueId());
 				if (banPlayer.getIPPardonTime() != null) continue; // pardoned from IP match bans.
 				BSSession active = banPlayer.getLatestSession();
@@ -181,9 +179,9 @@ public class BanHandler {
 					banPlayer.setBan(ban);
 					result.addPlayer(banPlayer);
 					if (banEnd != null) {
-						player.kickPlayer(message + ". Ends " + BanHandler.endTimeFormat.format(banEnd));
+						player.disconnect(message + ". Ends " + BanHandler.endTimeFormat.format(banEnd));
 					} else {
-						player.kickPlayer(message);
+						player.disconnect(message);
 					}
 				}
 			}
@@ -202,7 +200,7 @@ public class BanHandler {
 			
 			return result;
 		} catch (Exception e) {
-			BanStick.getPlugin().warning("Failed to issue IP ban: ", e);
+			BanStick.getPlugin().getLogger().warning("Failed to issue IP ban: " + e);
 			return new BanResult();
 		}
 	}
@@ -232,7 +230,7 @@ public class BanHandler {
 			BanResult result = new BanResult();
 			result.addBan(ban);
 			
-			for (Player player : Bukkit.getOnlinePlayers()) {
+			for (ProxiedPlayer player : BanStick.getPlugin().getProxy().getPlayers()) {
 				BSPlayer banPlayer = BSPlayer.byUUID(player.getUniqueId());
 				if (banPlayer.getBan() != null) continue; // already banned.
 				if (banPlayer.getIPPardonTime() != null) continue; // pardoned from IP match bans.
@@ -255,9 +253,9 @@ public class BanHandler {
 					banPlayer.setBan(ban);
 					result.addPlayer(banPlayer);
 					if (banEnd != null) {
-						player.kickPlayer(message + ". Ends " + BanHandler.endTimeFormat.format(banEnd));
+						player.disconnect(message + ". Ends " + BanHandler.endTimeFormat.format(banEnd));
 					} else {
-						player.kickPlayer(message);
+						player.disconnect(message);
 					}
 				}
 			}
@@ -279,7 +277,7 @@ public class BanHandler {
 			
 			return result;
 		} catch (Exception e) {
-			BanStick.getPlugin().warning("Failed to issue CIDR ban: ", e);
+			BanStick.getPlugin().getLogger().warning("Failed to issue CIDR ban: " + e);
 			return new BanResult();
 		}	
 	}
@@ -315,7 +313,7 @@ public class BanHandler {
 			}
 			return result;
 		} catch (Exception e) {
-			BanStick.getPlugin().warning("Failed to issue Share ban: ", e);
+			BanStick.getPlugin().getLogger().warning("Failed to issue Share ban: " + e);
 			return new BanResult();
 		}
 	}

@@ -132,9 +132,9 @@ public class BSBan {
 				if (batchSize > 0 && batchSize % 100 == 0) {
 					int[] batchRun = save.executeBatch();
 					if (batchRun.length != batchSize) {
-						BanStick.getPlugin().severe("Some elements of the dirty batch didn't save? " + batchSize + " vs " + batchRun.length);
+						BanStick.getPlugin().getLogger().severe("Some elements of the dirty batch didn't save? " + batchSize + " vs " + batchRun.length);
 					} else {
-						BanStick.getPlugin().debug("Ban batch: {0} saves", batchRun.length);
+						BanStick.getPlugin().getLogger().warning("Ban batch: " + batchRun.length + " saves");
 					}
 					batchSize = 0;
 				}
@@ -142,13 +142,13 @@ public class BSBan {
 			if (batchSize > 0 && batchSize % 100 > 0) {
 				int[] batchRun = save.executeBatch();
 				if (batchRun.length != batchSize) {
-					BanStick.getPlugin().severe("Some elements of the dirty batch didn't save? " + batchSize + " vs " + batchRun.length);
+					BanStick.getPlugin().getLogger().severe("Some elements of the dirty batch didn't save? " + batchSize + " vs " + batchRun.length);
 				} else {
-					BanStick.getPlugin().debug("Ban batch: {0} saves", batchRun.length);
+					BanStick.getPlugin().getLogger().warning("Ban batch: " + batchRun.length + " saves");
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Save of BSBan dirty batch failed!: ", se);
+			BanStick.getPlugin().getLogger().severe("Save of BSBan dirty batch failed!: " + se);
 		}
 	}
 	
@@ -163,10 +163,10 @@ public class BSBan {
 			saveToStatement(save);
 			int effects = save.executeUpdate();
 			if (effects == 0) {
-				BanStick.getPlugin().severe("Failed to save BSBan or no update? " + this.bid);
+				BanStick.getPlugin().getLogger().severe("Failed to save BSBan or no update? " + this.bid);
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Save of BSBan failed!: ", se);
+			BanStick.getPlugin().getLogger().severe("Save of BSBan failed!: " + se);
 		}
 	}
 	
@@ -210,11 +210,11 @@ public class BSBan {
 					allBanID.put(bid,  ban);
 					return ban;
 				} else {
-					BanStick.getPlugin().warning("Failed to retrieve Ban by id: " + bid + " - not found");
+					BanStick.getPlugin().getLogger().warning("Failed to retrieve Ban by id: " + bid + " - not found");
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Retrieval of ban by ID failed: " + bid, se);
+			BanStick.getPlugin().getLogger().severe("Retrieval of ban by ID failed: " + bid + se);
 		}
 		return null;
 	}
@@ -246,7 +246,7 @@ public class BSBan {
 					if (rs.next()) { 
 						newBan.bid = rs.getLong(1);
 					} else {
-						BanStick.getPlugin().severe("No BID returned on ban insert?!");
+						BanStick.getPlugin().getLogger().severe("No BID returned on ban insert?!");
 						return null; // no bid? error.
 					}
 				}
@@ -255,7 +255,7 @@ public class BSBan {
 			allBanID.put(newBan.bid, newBan);
 			return newBan;
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to create a new ban record: ", se);
+			BanStick.getPlugin().getLogger().severe("Failed to create a new ban record: " + se);
 		}
 		return null;
 	}
@@ -279,7 +279,7 @@ public class BSBan {
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to lookup bans by IP: " + exactIP, se);
+			BanStick.getPlugin().getLogger().severe("Failed to lookup bans by IP: " + exactIP + se);
 		}
 		return results;
 	}
@@ -303,7 +303,7 @@ public class BSBan {
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to lookup bans by IP Data: " + data, se);
+			BanStick.getPlugin().getLogger().severe("Failed to lookup bans by IP Data: " + data + se);
 		}
 		return results;
 	}
@@ -327,7 +327,7 @@ public class BSBan {
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to lookup bans by Share: " + data, se);
+			BanStick.getPlugin().getLogger().severe("Failed to lookup bans by Share: " + data + se);
 		}
 		return results;
 	}
@@ -363,7 +363,7 @@ public class BSBan {
 					if (rs.next()) { 
 						newBan.bid = rs.getLong(1);
 					} else {
-						BanStick.getPlugin().severe("No BID returned on ban insert?!");
+						BanStick.getPlugin().getLogger().severe("No BID returned on ban insert?!");
 						return null; // no bid? error.
 					}
 				}
@@ -372,7 +372,7 @@ public class BSBan {
 			allBanID.put(newBan.bid, newBan);
 			return newBan;
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to create a new ip ban record: ", se);
+			BanStick.getPlugin().getLogger().severe("Failed to create a new ip ban record: " + se);
 		}
 		return null;
 	}
@@ -408,7 +408,7 @@ public class BSBan {
 					if (rs.next()) { 
 						newBan.bid = rs.getLong(1);
 					} else {
-						BanStick.getPlugin().severe("No BID returned on ban insert?!");
+						BanStick.getPlugin().getLogger().severe("No BID returned on ban insert?!");
 						return null; // no bid? error.
 					}
 				}
@@ -417,7 +417,7 @@ public class BSBan {
 			allBanID.put(newBan.bid, newBan);
 			return newBan;
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to create a new proxy ban record: ", se);
+			BanStick.getPlugin().getLogger().severe("Failed to create a new proxy ban record: " + se);
 		}
 		return null;
 	}
@@ -453,7 +453,7 @@ public class BSBan {
 					if (rs.next()) { 
 						newBan.bid = rs.getLong(1);
 					} else {
-						BanStick.getPlugin().severe("No BID returned on ban insert?!");
+						BanStick.getPlugin().getLogger().severe("No BID returned on ban insert?!");
 						return null; // no bid? error.
 					}
 				}
@@ -462,7 +462,7 @@ public class BSBan {
 			allBanID.put(newBan.bid, newBan);
 			return newBan;
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to create a new share ban record: ", se);
+			BanStick.getPlugin().getLogger().severe("Failed to create a new share ban record: " + se);
 		}
 		return null;
 	}
@@ -523,7 +523,7 @@ public class BSBan {
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed during Ban preload, offset " + offset + " limit " + limit, se);
+			BanStick.getPlugin().getLogger().severe("Failed during Ban preload, offset " + offset + " limit " + limit + se);
 		}
 		return maxId;
 	}

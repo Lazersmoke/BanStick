@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import com.programmerdan.minecraft.banstick.BanStick;
 import com.programmerdan.minecraft.banstick.handler.BanStickDatabaseHandler;
 
-import org.bukkit.ChatColor;
+import net.md_5.bungee.api.ChatColor;
 
 public class BSShare {
 
@@ -117,11 +117,11 @@ public class BSShare {
 					allShareID.put(sid, nS);
 					return nS;
 				} else {
-					BanStick.getPlugin().warning("Failed to retrieve Share by id: " + sid + " - not found");
+					BanStick.getPlugin().getLogger().warning("Failed to retrieve Share by id: " + sid + " - not found");
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Retrieval of Share by ID failed: " + sid, se);
+			BanStick.getPlugin().getLogger().severe("Retrieval of Share by ID failed: " + sid + se);
 		}
 
 		return null;
@@ -145,7 +145,7 @@ public class BSShare {
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Retrieval of Shares by Player failed: " + player.toString(), se);
+			BanStick.getPlugin().getLogger().severe("Retrieval of Shares by Player failed: " + player.toString() + se);
 		}
 		return shares;
 	}
@@ -168,7 +168,7 @@ public class BSShare {
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Retrieval of Shares by Session failed: " + session.toString(), se);
+			BanStick.getPlugin().getLogger().severe("Retrieval of Shares by Session failed: " + session.toString() + se);
 		}
 		return shares;
 	}
@@ -216,9 +216,9 @@ public class BSShare {
 				if (batchSize > 0 && batchSize % 100 == 0) {
 					int[] batchRun = save.executeBatch();
 					if (batchRun.length != batchSize) {
-						BanStick.getPlugin().severe("Some elements of the dirty batch didn't save? " + batchSize + " vs " + batchRun.length);
+						BanStick.getPlugin().getLogger().severe("Some elements of the dirty batch didn't save? " + batchSize + " vs " + batchRun.length);
 					} else {
-						BanStick.getPlugin().debug("Share batch: {0} saves", batchRun.length);
+						BanStick.getPlugin().getLogger().warning("Share batch: " + batchRun.length + " saves");
 					}
 					batchSize = 0;
 				}
@@ -226,13 +226,13 @@ public class BSShare {
 			if (batchSize > 0 && batchSize % 100 > 0) {
 				int[] batchRun = save.executeBatch();
 				if (batchRun.length != batchSize) {
-					BanStick.getPlugin().severe("Some elements of the dirty batch didn't save? " + batchSize + " vs " + batchRun.length);
+					BanStick.getPlugin().getLogger().severe("Some elements of the dirty batch didn't save? " + batchSize + " vs " + batchRun.length);
 				} else {
-					BanStick.getPlugin().debug("Share batch: {0} saves", batchRun.length);
+					BanStick.getPlugin().getLogger().warning("Share batch: " + batchRun.length + " saves");
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Save of BSShare dirty batch failed!: ", se);
+			BanStick.getPlugin().getLogger().severe("Save of BSShare dirty batch failed!: " + se);
 		}
 	}
 	
@@ -247,10 +247,10 @@ public class BSShare {
 			saveToStatement(save);
 			int effects = save.executeUpdate();
 			if (effects == 0) {
-				BanStick.getPlugin().severe("Failed to save BSShare or no update? " + this.sid);
+				BanStick.getPlugin().getLogger().severe("Failed to save BSShare or no update? " + this.sid);
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Save of BSShare failed!: ", se);
+			BanStick.getPlugin().getLogger().severe("Save of BSShare failed!: " + se);
 		}
 	}
 	
@@ -301,7 +301,7 @@ public class BSShare {
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed during Share preload, offset " + offset + " limit " + limit, se);
+			BanStick.getPlugin().getLogger().severe("Failed during Share preload, offset " + offset + " limit " + limit + se);
 		}
 		return maxId;
 	}
@@ -363,7 +363,7 @@ public class BSShare {
 			
 			int ins = newShare.executeUpdate();
 			if (ins < 1) {
-				BanStick.getPlugin().warning("Insert reported no share inserted? " + share.getId());
+				BanStick.getPlugin().getLogger().warning("Insert reported no share inserted? " + share.getId());
 			}
 		
 			try (ResultSet rs = newShare.getGeneratedKeys()) {
@@ -374,12 +374,12 @@ public class BSShare {
 					allShareID.put(sid, share);
 					return share;
 				} else {
-					BanStick.getPlugin().severe("Failed to get ID from inserted share!? " + overlap.getId() + " - " + session.getId());
+					BanStick.getPlugin().getLogger().severe("Failed to get ID from inserted share!? " + overlap.getId() + " - " + session.getId());
 					return null;
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to insert new share for sessions!", se);
+			BanStick.getPlugin().getLogger().severe("Failed to insert new share for sessions!" + se);
 		}
 		return null;
 	}

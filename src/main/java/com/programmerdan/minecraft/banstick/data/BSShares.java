@@ -133,11 +133,11 @@ public class BSShares {
 					}
 				}
 				if (shareList.size() == 0) {
-					BanStick.getPlugin().info("No Shares for {0}", forPlayer.getName());
+					BanStick.getPlugin().getLogger().info("No Shares for " + forPlayer.getName());
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to get list of Share ids", se);
+			BanStick.getPlugin().getLogger().severe("Failed to get list of Share ids" + se);
 		}
 	}
 	
@@ -158,7 +158,7 @@ public class BSShares {
 					addNew(newOverlap, session.getPlayer());
 					session.getPlayer().addShare(newOverlap, forPlayer);
 				} else {
-					BanStick.getPlugin().debug("Failed while generating share/overlap?");
+					BanStick.getPlugin().getLogger().warning("Failed while generating share/overlap?");
 				}
 			}
 		}
@@ -172,7 +172,7 @@ public class BSShares {
 		this.unpardonedList.add(share.getId());
 		// be sure it gets promoted to the opposing record
 		
-		BanStick.getPlugin().info("Found new overlap between {0} and {1}", forPlayer.getName(), player.getName());
+		BanStick.getPlugin().getLogger().info("Found new overlap between " + forPlayer.getName() + " and " + player.getName());
 
 	}
 	

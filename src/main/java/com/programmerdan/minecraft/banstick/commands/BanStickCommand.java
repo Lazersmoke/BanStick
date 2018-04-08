@@ -1,8 +1,5 @@
 package com.programmerdan.minecraft.banstick.commands;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.programmerdan.minecraft.banstick.BanStick;
 import com.programmerdan.minecraft.banstick.containers.BanResult;
 import com.programmerdan.minecraft.banstick.data.BSIP;
@@ -19,12 +16,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-
-import vg.civcraft.mc.namelayer.NameAPI;
+import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.CommandSender;
 
 /**
  * BanStick! BanStick! Ban all the nerds by name, CIDR, IP, or some combo.
@@ -32,7 +25,7 @@ import vg.civcraft.mc.namelayer.NameAPI;
  * @author <a href="mailto:programmerdan@gmail.com">ProgrammerDan</a>
  *
  */
-public class BanStickCommand implements CommandExecutor {
+public class BanStickCommand extends Command {
 
 	public static String name = "banstick";
 	

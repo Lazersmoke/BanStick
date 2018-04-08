@@ -1,7 +1,5 @@
 package com.programmerdan.minecraft.banstick.handler;
 
-import org.bukkit.configuration.file.FileConfiguration;
-
 import com.programmerdan.minecraft.banstick.BanStick;
 import com.programmerdan.minecraft.banstick.commands.BanSaveCommand;
 import com.programmerdan.minecraft.banstick.commands.BanStickCommand;
@@ -25,14 +23,14 @@ public class BanStickCommandHandler {
 	}
 	
 	private void registerCommands() {
-		BanStick.getPlugin().getCommand(BanStickCommand.name).setExecutor(new BanStickCommand());
-		BanStick.getPlugin().getCommand(DoubleTapCommand.name).setExecutor(new DoubleTapCommand());
-		BanStick.getPlugin().getCommand(ForgiveCommand.name).setExecutor(new ForgiveCommand());
-		BanStick.getPlugin().getCommand(BanSaveCommand.name).setExecutor(new BanSaveCommand());
-		BanStick.getPlugin().getCommand(LoveTapCommand.name).setExecutor(new LoveTapCommand());
-		BanStick.getPlugin().getCommand(TakeItBackCommand.name).setExecutor(new TakeItBackCommand());
-		BanStick.getPlugin().getCommand(DowsingRodCommand.name).setExecutor(new DowsingRodCommand());
-		BanStick.getPlugin().getCommand(DrillDownCommand.name).setExecutor(new DrillDownCommand());
+		BanStick.getPlugin().getProxy().getPluginManager().registerCommand(BanStick.getPlugin(),new BanStickCommand());
+		BanStick.getPlugin().getProxy().getPluginManager().registerCommand(BanStick.getPlugin(),new DoubleTapCommand());
+		BanStick.getPlugin().getProxy().getPluginManager().registerCommand(BanStick.getPlugin(),new ForgiveCommand());
+		BanStick.getPlugin().getProxy().getPluginManager().registerCommand(BanStick.getPlugin(),new BanSaveCommand());
+		BanStick.getPlugin().getProxy().getPluginManager().registerCommand(BanStick.getPlugin(),new LoveTapCommand());
+		BanStick.getPlugin().getProxy().getPluginManager().registerCommand(BanStick.getPlugin(),new TakeItBackCommand());
+		BanStick.getPlugin().getProxy().getPluginManager().registerCommand(BanStick.getPlugin(),new DowsingRodCommand());
+		BanStick.getPlugin().getProxy().getPluginManager().registerCommand(BanStick.getPlugin(),new DrillDownCommand());
 	}
 
 }

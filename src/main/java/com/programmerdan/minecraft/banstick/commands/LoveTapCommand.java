@@ -6,12 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.CommandSender;
 
 import com.programmerdan.minecraft.banstick.BanStick;
 import com.programmerdan.minecraft.banstick.data.BSBan;
@@ -24,13 +20,14 @@ import com.programmerdan.minecraft.banstick.data.BSShare;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 import inet.ipaddr.IPAddressStringException;
+
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import vg.civcraft.mc.namelayer.NameAPI;
+import net.md_5.bungee.api.ChatColor;
 
-public class LoveTapCommand  implements CommandExecutor {
+public class LoveTapCommand extends Command {
 
 	public static String name = "lovetap";
 	

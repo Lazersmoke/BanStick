@@ -1,10 +1,9 @@
 package com.programmerdan.minecraft.banstick.handler;
 
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.scheduler.BukkitTask;
-
 import com.programmerdan.minecraft.banstick.BanStick;
+
+import net.md_5.bungee.api.scheduler.ScheduledTask;
+import net.md_5.bungee.config.Configuration;
 
 /**
  * Middleweight wrapper. Put implementations into banstick.scraper classpath for autoloading.
@@ -17,7 +16,7 @@ import com.programmerdan.minecraft.banstick.BanStick;
  */
 public abstract class ScraperWorker implements Runnable {
 
-	private BukkitTask currentTask = null;
+	private ScheduledTask currentTask = null;
 	private boolean enabled = false;
 	private long delay = 4200l;
 	private long period = 576000l;
@@ -157,7 +156,7 @@ public abstract class ScraperWorker implements Runnable {
 	@Override
 	public final void run() {
 		try {
-			BanStick.getPlugin().debug("Running Scraper Worker {0}", name());
+			BanStick.getPlugin().warning("Running Scraper Worker " + name());
 			scrape();
 		} catch (Exception e) {
 			BanStick.getPlugin().warning("Scraper Worker {0} uncaught failure during scrape", name());
@@ -171,13 +170,13 @@ public abstract class ScraperWorker implements Runnable {
 			
 			if (this.errorCooldown > 0) {
 				BanStick.getPlugin().warning("Error threshold exceeded; cooldown engaged for {0}.", name());
-				this.currentTask = Bukkit.getScheduler().runTaskLaterAsynchronously(BanStick.getPlugin(), this, jitter(this.errorCooldown));
+				this.currentTask = BanStick.getPlugin().getProxy().getScheduler().runAsync(BanStick.getPlugin(), this, jitter(this.errorCooldown));
 			} else {
 				this.enabled = false;
 				BanStick.getPlugin().warning("Error threshold exceeded; {0} disabled.", name());
 			}
 		} else {
-			this.currentTask = Bukkit.getScheduler().runTaskLaterAsynchronously(BanStick.getPlugin(), this, jitter(this.delay));
+			this.currentTask = BanStick.getPlugin().getProxy().getScheduler().runAsync(BanStick.getPlugin(), this, jitter(this.delay));
 		}
 	}
 	

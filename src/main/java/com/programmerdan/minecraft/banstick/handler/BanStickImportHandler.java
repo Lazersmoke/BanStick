@@ -4,13 +4,10 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.scheduler.BukkitTask;
-
 import com.google.common.reflect.ClassPath;
 import com.programmerdan.minecraft.banstick.BanStick;
+
+import net.md_5.bungee.config.Configuration;
 
 /**
  * Many folks might be migrating from an existing ban management system to BanStick; this is meant
@@ -27,11 +24,11 @@ public class BanStickImportHandler {
 
 	ArrayList<ImportWorker> workers;
 	
-	public BanStickImportHandler(FileConfiguration config, ClassLoader classes) {
+	public BanStickImportHandler(Configuration config, ClassLoader classes) {
 		setup(config.getConfigurationSection("import"), classes);
 	}
 	
-	private void setup(ConfigurationSection config, ClassLoader classes) {
+	private void setup(Configuration config, ClassLoader classes) {
 		if (config == null || !config.getBoolean("enable", false)) {
 			BanStick.getPlugin().warning("All Import Workers disabled");
 			return;
@@ -49,7 +46,8 @@ public class BanStickImportHandler {
 				if (clazz != null && ImportWorker.class.isAssignableFrom(clazz)) {
 					ImportWorker loader = null;
 					try {
-						Constructor<?> constructBasic = clazz.getConstructor(ConfigurationSection.class);
+						// TODO: reverify
+						Constructor<?> constructBasic = clazz.getConstructor(Configuration.class);
 						loader = (ImportWorker) constructBasic.newInstance(config);
 						BanStick.getPlugin().info("Created a new import worker of type {0}", clazz.getName());
 					} catch (Exception e) {

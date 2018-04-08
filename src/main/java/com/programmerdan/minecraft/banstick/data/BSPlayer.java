@@ -16,8 +16,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.bukkit.entity.Player;
-
 import com.programmerdan.minecraft.banstick.BanStick;
 import com.programmerdan.minecraft.banstick.data.BSShare;
 import com.programmerdan.minecraft.banstick.handler.BanStickDatabaseHandler;
@@ -207,9 +205,9 @@ public class BSPlayer {
 				if (batchSize > 0 && batchSize % 100 == 0) {
 					int[] batchRun = savePlayer.executeBatch();
 					if (batchRun.length != batchSize) {
-						BanStick.getPlugin().severe("Some elements of the dirt batch didn't save? " + batchSize + " vs " + batchRun.length);
+						BanStick.getPlugin().getLogger().severe("Some elements of the dirt batch didn't save? " + batchSize + " vs " + batchRun.length);
 					} else {
-						BanStick.getPlugin().debug("Player batch: {0} saves", batchRun.length);
+						BanStick.getPlugin().getLogger().warning("Player batch: " + batchRun.length + " saves");
 					}
 					batchSize = 0;
 				}
@@ -217,13 +215,13 @@ public class BSPlayer {
 			if (batchSize > 0 && batchSize % 100 > 0) {
 				int[] batchRun = savePlayer.executeBatch();
 				if (batchRun.length != batchSize) {
-					BanStick.getPlugin().severe("Some elements of the dirt batch didn't save? " + batchSize + " vs " + batchRun.length);
+					BanStick.getPlugin().getLogger().severe("Some elements of the dirt batch didn't save? " + batchSize + " vs " + batchRun.length);
 				} else {
-					BanStick.getPlugin().debug("Player batch: {0} saves", batchRun.length);
+					BanStick.getPlugin().getLogger().warning("Player batch: " + batchRun.length + " saves");
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Save of BSPlayer dirty batch failed!: ", se);
+			BanStick.getPlugin().getLogger().severe("Save of BSPlayer dirty batch failed!: " + se);
 		}
 	}
 	
@@ -238,10 +236,10 @@ public class BSPlayer {
 			saveToStatement(savePlayer);
 			int effects = savePlayer.executeUpdate();
 			if (effects == 0) {
-				BanStick.getPlugin().severe("Failed to save BSPlayer or no update? " + this.pid);
+				BanStick.getPlugin().getLogger().severe("Failed to save BSPlayer or no update? " + this.pid);
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Save of BSPlayer failed!: ", se);
+			BanStick.getPlugin().getLogger().severe("Save of BSPlayer failed!: " + se);
 		}
 	}
 	
@@ -316,7 +314,7 @@ public class BSPlayer {
 					if (rs.next()) { 
 						newPlayer.pid = rs.getLong(1);
 					} else {
-						BanStick.getPlugin().severe("No PID returned on player insert?!");
+						BanStick.getPlugin().getLogger().severe("No PID returned on player insert?!");
 						return null; // no pid? error.
 					}
 				}
@@ -330,7 +328,7 @@ public class BSPlayer {
 			allPlayersUUID.put(newPlayer.uuid, newPlayer);
 			return newPlayer;
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to create a new player record: ", se);
+			BanStick.getPlugin().getLogger().severe("Failed to create a new player record: " + se);
 			return null;
 		}
 	}
@@ -397,7 +395,7 @@ public class BSPlayer {
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to execute query to get player: " + uuid.toString(), se);
+			BanStick.getPlugin().getLogger().severe("Failed to execute query to get player: " + uuid.toString() + se);
 		}
 		return null; //TODO: exception
 	}
@@ -459,7 +457,7 @@ public class BSPlayer {
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to execute query to get player: " + pid, se);
+			BanStick.getPlugin().getLogger().severe("Failed to execute query to get player: " + pid + se);
 		}
 		return null; // TODO: exception
 	}
@@ -492,7 +490,7 @@ public class BSPlayer {
 					if (rs.next()) { 
 						newPlayer.pid = rs.getLong(1);
 					} else {
-						BanStick.getPlugin().severe("No PID returned on player insert?!");
+						BanStick.getPlugin().getLogger().severe("No PID returned on player insert?!");
 						return null; // no pid? error.
 					}
 				}
@@ -506,7 +504,7 @@ public class BSPlayer {
 			allPlayersUUID.put(newPlayer.uuid, newPlayer);
 			return newPlayer;
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to create a new player record: ", se);
+			BanStick.getPlugin().getLogger().severe("Failed to create a new player record: " + se);
 			return null;
 		}
 	}
@@ -575,7 +573,7 @@ public class BSPlayer {
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed during Player preload, offset " + offset + " limit " + limit, se);
+			BanStick.getPlugin().getLogger().severe("Failed during Player preload, offset " + offset + " limit " + limit + se);
 		}
 		return maxId;
 	}

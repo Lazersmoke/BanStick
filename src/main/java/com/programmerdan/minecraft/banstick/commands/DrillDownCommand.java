@@ -12,12 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.CommandSender;
 
 import com.programmerdan.minecraft.banstick.BanStick;
 import com.programmerdan.minecraft.banstick.data.BSIP;
@@ -31,7 +27,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 
-public class DrillDownCommand  implements CommandExecutor {
+public class DrillDownCommand extends Command {
 
 	public static enum Action {
 		PLAYER,
@@ -225,12 +221,10 @@ public class DrillDownCommand  implements CommandExecutor {
 								TextComponent line = new TextComponent("  " + data.toFullString(sender.hasPermission("banstick.ips")));
 								line.setColor(net.md_5.bungee.api.ChatColor.WHITE);
 								line.setBold(true);
-								if (sender instanceof Player && sender.hasPermission("banstick.ips")) {
+								if (sender.hasPermission("banstick.ips")) {
 									line.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, detailCmd.toString()));
-									((Player) sender).spigot().sendMessage(line);
-								} else {
-									sender.sendMessage(line.toLegacyText());
 								}
+								sender.sendMessage(line);
 							}
 							if (Action.IPDATASUMMARY.equals(action)) {
 								datas.add(data);
@@ -288,11 +282,7 @@ public class DrillDownCommand  implements CommandExecutor {
 							orDetail.setColor(net.md_5.bungee.api.ChatColor.GOLD);
 							orDetail.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/drilldown IPDATASUMMARY" + sb.toString()));
 						
-						if (sender instanceof Player) {
-							((Player) sender).spigot().sendMessage(summary, orDetail);
-						} else {
-							sender.sendMessage(summary.toLegacyText());
-						}
+						sender.sendMessage(summary, orDetail);
 					} else if (Action.IP.equals(action)) {
 						for (BSIP ip : ips) {
 							StringBuilder detailCmd = new StringBuilder("/lovetap ");

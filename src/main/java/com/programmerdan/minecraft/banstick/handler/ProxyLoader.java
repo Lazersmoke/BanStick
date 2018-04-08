@@ -1,7 +1,8 @@
 package com.programmerdan.minecraft.banstick.handler;
 
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.scheduler.BukkitRunnable;
+import java.lang.Runnable;
+
+import net.md_5.bungee.config.Configuration;
 
 import com.programmerdan.minecraft.banstick.BanStick;
 
@@ -12,7 +13,7 @@ import com.programmerdan.minecraft.banstick.BanStick;
  * @author ProgrammerDan
  *
  */
-public abstract class ProxyLoader extends BukkitRunnable {
+public abstract class ProxyLoader extends Runnable {
 
 	private boolean enabled = false;
 	private long delay = 4200l;
@@ -23,9 +24,9 @@ public abstract class ProxyLoader extends BukkitRunnable {
 	 * 
 	 * @param config The configuration to use.
 	 */
-	public ProxyLoader(ConfigurationSection config) {
+	public ProxyLoader(Configuration config) {
 		BanStick.getPlugin().info("ProxyLoader loading for: {0}", name());
-		ConfigurationSection internalConfig = config.getConfigurationSection(name());
+		Configuration internalConfig = config.getSection(name());
 		if (internalConfig == null) {
 			throw new RuntimeException("ProxyLoader has no config; disabled");
 		}
@@ -68,7 +69,7 @@ public abstract class ProxyLoader extends BukkitRunnable {
 	 * @param config 
 	 * The config to use to set up the proxy loader
 	 */
-	public abstract void setup(ConfigurationSection config);
+	public abstract void setup(Configuration config);
 	
 	/**
 	 * Give it a unique name / identity within the config.yml

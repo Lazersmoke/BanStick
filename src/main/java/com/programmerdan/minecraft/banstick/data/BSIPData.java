@@ -181,11 +181,11 @@ public class BSIPData {
 					allIPDataID.put(idid,  data);
 					return data;
 				} else {
-					BanStick.getPlugin().warning("Failed to retrieve IP Data by id: " + idid + " - not found");
+					BanStick.getPlugin().getLogger().warning("Failed to retrieve IP Data by id: " + idid + " - not found");
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Retrieval of IP Data by ID failed: " + idid, se);
+			BanStick.getPlugin().getLogger().severe("Retrieval of IP Data by ID failed: " + idid + se);
 		}
 		return null;
 	}
@@ -245,11 +245,11 @@ public class BSIPData {
 					found.add(data);
 				}
 				if (found.isEmpty()) {
-					BanStick.getPlugin().debug("Found no other IP Data in same city as {0}", source);
+					BanStick.getPlugin().getLogger().warning("Found no other IP Data in same city as" + source);
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Retrieval of same-city IP Data by IP Data failed: " + source, se);
+			BanStick.getPlugin().getLogger().severe("Retrieval of same-city IP Data by IP Data failed: " + source + se);
 		}
 		return found;
 	}
@@ -261,7 +261,7 @@ public class BSIPData {
 	 */
 	public static BSIPData byExactIP(BSIP ip) {
 		if (ip == null) {
-			BanStick.getPlugin().warning("Weird failure, byExactIP with null IP");
+			BanStick.getPlugin().getLogger().warning("Weird failure, byExactIP with null IP");
 			return null;
 		}
 		try (Connection connection = BanStickDatabaseHandler.getinstanceData().getConnection();
@@ -276,11 +276,11 @@ public class BSIPData {
 					allIPDataID.put(data.idid,  data);
 					return data;
 				} else {
-					BanStick.getPlugin().warning("Failed to retrieve IP Data by exact IP: {0} - not found", ip);
+					BanStick.getPlugin().getLogger().warning("Failed to retrieve IP Data by exact IP: {0} - not found" + ip);
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Retrieval of IP Data by exact IP failed: " + ip, se);
+			BanStick.getPlugin().getLogger().severe("Retrieval of IP Data by exact IP failed: " + ip, se);
 		}
 		return null;
 	}
@@ -294,12 +294,12 @@ public class BSIPData {
 	public static BSIPData byContainsIP(BSIP ip) {
 		try {
 			if (ip == null) {
-				BanStick.getPlugin().warning("Weird failure, byContainsIP with null IP");
+				BanStick.getPlugin().getLogger().warning("Weird failure, byContainsIP with null IP");
 				return null;
 			}
 			IPAddress address = ip.getIPAddress();
 			if (address == null) {
-				BanStick.getPlugin().warning("Weird failure, no ip _in_ {0}", ip.toString());
+				BanStick.getPlugin().getLogger().warning("Weird failure, no ip _in_ " + ip.toString());
 				return null;
 			}
 			Integer cidr = address.getNetworkPrefixLength();
@@ -316,9 +316,9 @@ public class BSIPData {
 					}
 				}
 			}
-			BanStick.getPlugin().warning("No IPData records contain IP {0}", ip);
+			BanStick.getPlugin().getLogger().warning("No IPData records contain IP " + ip);
 		} catch (Exception e) {
-			BanStick.getPlugin().warning("Failure during IPData retrieval", e);
+			BanStick.getPlugin().getLogger().warning("Failure during IPData retrieval" + e);
 		}
 		return null;
 	}
@@ -333,12 +333,12 @@ public class BSIPData {
 		List<BSIPData> returns = new ArrayList<BSIPData>();
 		try {
 			if (ip == null) {
-				BanStick.getPlugin().warning("Weird failure, allByIP with null IP");
+				BanStick.getPlugin().getLogger().warning("Weird failure, allByIP with null IP");
 				return returns;
 			}
 			IPAddress address = ip.getIPAddress();
 			if (address == null) {
-				BanStick.getPlugin().warning("Weird failure, no ip _in_ {0}", ip.toString());
+				BanStick.getPlugin().getLogger().warning("Weird failure, no ip _in_ " + ip.toString());
 				return returns;
 			}
 			Integer cidr = address.getNetworkPrefixLength();
@@ -356,10 +356,10 @@ public class BSIPData {
 				}
 			}
 			if (returns.isEmpty()) {
-				BanStick.getPlugin().warning("No IPData records contain IP {0}", ip);
+				BanStick.getPlugin().getLogger().warning("No IPData records contain IP " + ip);
 			}
 		} catch (Exception e) {
-			BanStick.getPlugin().warning("Failure during IPData retrieval", e);
+			BanStick.getPlugin().getLogger().warning("Failure during IPData retrieval" + e);
 		}
 		return returns;
 	}
@@ -479,7 +479,7 @@ public class BSIPData {
 					if (rs.next()) { 
 						newData.idid = rs.getLong(1);
 					} else {
-						BanStick.getPlugin().severe("No IDID returned on IP Data insert?!");
+						BanStick.getPlugin().getLogger().severe("No IDID returned on IP Data insert?!");
 						return null; // no bid? error.
 					}
 				}
@@ -488,7 +488,7 @@ public class BSIPData {
 			allIPDataID.put(newData.idid, newData);
 			return newData;
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to create a new ip data record: ", se);
+			BanStick.getPlugin().getLogger().severe("Failed to create a new ip data record: " + se);
 		}
 		return null;
 	}
@@ -504,10 +504,10 @@ public class BSIPData {
 			saveToStatement(save);
 			int effects = save.executeUpdate();
 			if (effects == 0) {
-				BanStick.getPlugin().severe("Failed to save BSIPData or no update? " + this.idid);
+				BanStick.getPlugin().getLogger().severe("Failed to save BSIPData or no update? " + this.idid);
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Save of BSIPData failed!: ", se);
+			BanStick.getPlugin().getLogger().severe("Save of BSIPData failed!: " + se);
 		}
 	}
 	
@@ -560,9 +560,9 @@ public class BSIPData {
 				if (batchSize > 0 && batchSize % 100 == 0) {
 					int[] batchRun = save.executeBatch();
 					if (batchRun.length != batchSize) {
-						BanStick.getPlugin().severe("Some elements of the dirty batch didn't save? " + batchSize + " vs " + batchRun.length);
+						BanStick.getPlugin().getLogger().severe("Some elements of the dirty batch didn't save? " + batchSize + " vs " + batchRun.length);
 					} else {
-						BanStick.getPlugin().debug("IP Data batch: {0} saves", batchRun.length);
+						BanStick.getPlugin().getLogger().warning("IP Data batch: " + batchRun.length + " saves");
 					}
 					batchSize = 0;
 				}
@@ -570,13 +570,13 @@ public class BSIPData {
 			if (batchSize > 0 && batchSize % 100 > 0) {
 				int[] batchRun = save.executeBatch();
 				if (batchRun.length != batchSize) {
-					BanStick.getPlugin().severe("Some elements of the dirty batch didn't save? " + batchSize + " vs " + batchRun.length);
+					BanStick.getPlugin().getLogger().severe("Some elements of the dirty batch didn't save? " + batchSize + " vs " + batchRun.length);
 				} else {
-					BanStick.getPlugin().debug("IP Data batch: {0} saves", batchRun.length);
+					BanStick.getPlugin().getLogger().warning("IP Data batch: " + batchRun.length + " saves");
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Save of BSIPData dirty batch failed!: ", se);
+			BanStick.getPlugin().getLogger().severe("Save of BSIPData dirty batch failed!: " + se);
 		}
 	}
 
@@ -605,7 +605,7 @@ public class BSIPData {
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed during IPData preload, offset " + offset + " limit " + limit, se);
+			BanStick.getPlugin().getLogger().severe("Failed during IPData preload, offset " + offset + " limit " + limit + se);
 		}
 		return maxId;
 

@@ -12,8 +12,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.bukkit.configuration.ConfigurationSection;
-
 import com.programmerdan.minecraft.banstick.BanStick;
 import com.programmerdan.minecraft.banstick.data.BSBan;
 import com.programmerdan.minecraft.banstick.data.BSIP;
@@ -25,6 +23,8 @@ import com.google.common.math.BigIntegerMath;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
 
+import net.md_5.bungee.config.Configuration;
+
 public final class Cloud9ProxyLoader extends ProxyLoader {
 
 	private String loadUrl;
@@ -33,7 +33,7 @@ public final class Cloud9ProxyLoader extends ProxyLoader {
 	private long banLength;
 	private String banMessage;
 	
-	public Cloud9ProxyLoader(ConfigurationSection config) {
+	public Cloud9ProxyLoader(Configuration config) {
 		super(config);
 	}
 	
@@ -163,7 +163,7 @@ public final class Cloud9ProxyLoader extends ProxyLoader {
 	}
 
 	@Override
-	public void setup(ConfigurationSection config) {
+	public void setup(Configuration config) {
 		this.loadUrl = config.getString("url");
 		this.proxyScore = (float) config.getDouble("defaultScore", 3.0d);
 		this.autoBan = config.isConfigurationSection("ban");

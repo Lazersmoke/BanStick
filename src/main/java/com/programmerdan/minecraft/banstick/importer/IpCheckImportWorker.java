@@ -8,10 +8,6 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
-
 import com.programmerdan.minecraft.banstick.BanStick;
 import com.programmerdan.minecraft.banstick.data.BSBan;
 import com.programmerdan.minecraft.banstick.data.BSIP;
@@ -20,24 +16,26 @@ import com.programmerdan.minecraft.banstick.handler.ImportWorker;
 
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
-import vg.civcraft.mc.civmodcore.dao.ManagedDatasource;
-import vg.civcraft.mc.namelayer.NameAPI;
+
+import net.md_5.bungee.config.Configuration;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 public class IpCheckImportWorker extends ImportWorker {
 
-	private ManagedDatasource internalDatabase;
+	private HikariDataSource internalDatabase;
 	
-	public IpCheckImportWorker(ConfigurationSection config) {
+	public IpCheckImportWorker(Configuration config) {
 		super(config);
 	}
 
 	@Override
-	public boolean internalSetup(ConfigurationSection config) {
+	public boolean internalSetup(Configuration config) {
 		if (config == null) return false;
 		return provisionDatabase(config.getConfigurationSection("database"));
 	}
 	
-	private boolean provisionDatabase(ConfigurationSection config) {
+	private boolean provisionDatabase(Configuration config) {
 		String host = config.getString("host", "localhost");
 		int port = config.getInt("port", 3306);
 		String dbname = config.getString("database", "ipcheck");

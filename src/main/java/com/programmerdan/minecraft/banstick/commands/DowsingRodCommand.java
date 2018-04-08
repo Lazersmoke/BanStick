@@ -7,20 +7,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
 import com.programmerdan.minecraft.banstick.BanStick;
 import com.programmerdan.minecraft.banstick.handler.BanStickDatabaseHandler;
 
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.ChatColor;
 
-public class DowsingRodCommand  implements CommandExecutor {
+import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.CommandSender;
+
+public class DowsingRodCommand extends Command {
 
 	public static String name = "dowsingrod";
 	
@@ -106,7 +104,7 @@ public class DowsingRodCommand  implements CommandExecutor {
 		}
 		queryString.append(subString).append("count(*) FROM bs_ip_data GROUP BY ").append(subString.substring(0, subString.length() - 2))
 			.append(" ORDER BY count(*) DESC LIMIT ").append(page * perpage).append(',').append(perpage);
-		BanStick.getPlugin().debug("Running query: " + queryString.toString());
+		BanStick.getPlugin().getLogger().warning("Running query: " + queryString.toString());
 		long requestLen = System.currentTimeMillis();
 		try (Connection connection = BanStickDatabaseHandler.getinstanceData().getConnection(); 
 				PreparedStatement complex = connection.prepareStatement(queryString.toString());
@@ -130,7 +128,7 @@ public class DowsingRodCommand  implements CommandExecutor {
 				toDisplay.add(storage);
 			}
 		} catch (SQLException e) {
-			BanStick.getPlugin().severe("Failure to satisfy request at a DB level!", e);
+			BanStick.getPlugin().getLogger().severe("Failure to satisfy request at a DB level!" + e);
 			sender.sendMessage(ChatColor.RED + "There was a database failure, try again later.");
 			return true;
 		} finally {
@@ -155,37 +153,30 @@ public class DowsingRodCommand  implements CommandExecutor {
 						(Object[]) Arrays.copyOfRange(data, 0, data.length - 1)));
 				line.setColor(net.md_5.bungee.api.ChatColor.WHITE);
 				line.setBold(true);
-				if (sender instanceof Player) {
-					line.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, data[data.length - 1]));
-					((Player) sender).spigot().sendMessage(line);
-				} else {
-					sender.sendMessage(line.toLegacyText());
-				}
+				line.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, data[data.length - 1]));
+				sender.sendMessage(line);
 			} 
-			if (sender instanceof Player) {
-				Player player = (Player) sender;
-				TextComponent controls = new TextComponent("Controls ");
-				controls.setColor(net.md_5.bungee.api.ChatColor.DARK_AQUA);
-				if (page > 0) {
-					TextComponent priorPage = new TextComponent("Prior ");
-					@SuppressWarnings("unchecked")
-					ArrayList<String> cmdH = (ArrayList<String>) sorts.clone();
-					cmdH.add((page - 1) + " " + perpage);
-					priorPage.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, "/dowsingrod " + String.format(formatString.toString(), cmdH.toArray())));
-					priorPage.setColor(net.md_5.bungee.api.ChatColor.GOLD);
-					controls.addExtra(priorPage);
-				}
-				if (toDisplay.size() == perpage) {
-					TextComponent nextPage = new TextComponent("Next ");
-					@SuppressWarnings("unchecked")
-					ArrayList<String> cmdH = (ArrayList<String>) sorts.clone();
-					cmdH.add((page + 1) + " " + perpage);
-					nextPage.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, "/dowsingrod " + String.format(formatString.toString(), cmdH.toArray())));
-					nextPage.setColor(net.md_5.bungee.api.ChatColor.GOLD);
-					controls.addExtra(nextPage);
-				}
-				player.spigot().sendMessage(controls);
+			TextComponent controls = new TextComponent("Controls ");
+			controls.setColor(net.md_5.bungee.api.ChatColor.DARK_AQUA);
+			if (page > 0) {
+				TextComponent priorPage = new TextComponent("Prior ");
+				@SuppressWarnings("unchecked")
+				ArrayList<String> cmdH = (ArrayList<String>) sorts.clone();
+				cmdH.add((page - 1) + " " + perpage);
+				priorPage.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, "/dowsingrod " + String.format(formatString.toString(), cmdH.toArray())));
+				priorPage.setColor(net.md_5.bungee.api.ChatColor.GOLD);
+				controls.addExtra(priorPage);
 			}
+			if (toDisplay.size() == perpage) {
+				TextComponent nextPage = new TextComponent("Next ");
+				@SuppressWarnings("unchecked")
+				ArrayList<String> cmdH = (ArrayList<String>) sorts.clone();
+				cmdH.add((page + 1) + " " + perpage);
+				nextPage.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, "/dowsingrod " + String.format(formatString.toString(), cmdH.toArray())));
+				nextPage.setColor(net.md_5.bungee.api.ChatColor.GOLD);
+				controls.addExtra(nextPage);
+			}
+			sender.sendMessage(controls);
 			sender.sendMessage(ChatColor.DARK_GRAY + "query took " + requestLen + " ms");
 			return true;
 		}

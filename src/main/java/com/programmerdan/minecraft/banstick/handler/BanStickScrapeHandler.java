@@ -4,11 +4,6 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.scheduler.BukkitTask;
-
 import com.google.common.reflect.ClassPath;
 import com.programmerdan.minecraft.banstick.BanStick;
 
@@ -30,12 +25,12 @@ public class BanStickScrapeHandler {
 	ArrayList<ScraperWorker> workers;
 	
 	public BanStickScrapeHandler(FileConfiguration config, ClassLoader classes) {
-		setup(config.getConfigurationSection("scrapers"), classes);
+		setup(config.getSection("scrapers"), classes);
 	}
 	
-	private void setup(ConfigurationSection config, ClassLoader classes) {
+	private void setup(Configuration config, ClassLoader classes) {
 		if (config == null || !config.getBoolean("enable", false)) {
-			BanStick.getPlugin().warning("All Scraper Workers disabled");
+			BanStick.getPlugin().getLogger().warning("All Scraper Workers disabled");
 			return;
 		}
 		
@@ -49,32 +44,32 @@ public class BanStickScrapeHandler {
 
 			for (ClassPath.ClassInfo clsInfo : getSamplersPath.getTopLevelClasses("com.programmerdan.minecraft.banstick.scraper")) {
 				Class<?> clazz = clsInfo.load();
-				BanStick.getPlugin().info("Found a scraper worker class {0}, attempting to find a suitable constructor", clazz.getName());
+				BanStick.getPlugin().getLogger().info("Found a scraper worker class {0}, attempting to find a suitable constructor" + clazz.getName());
 				if (clazz != null && ScraperWorker.class.isAssignableFrom(clazz)) {
 					ScraperWorker loader = null;
 					try {
-						Constructor<?> constructBasic = clazz.getConstructor(ConfigurationSection.class);
+						Constructor<?> constructBasic = clazz.getConstructor(Configuration.class);
 						loader = (ScraperWorker) constructBasic.newInstance(config);
-						BanStick.getPlugin().info("Created a new scraper worker of type {0}", clazz.getName());
+						BanStick.getPlugin().getLogger().info("Created a new scraper worker of type {0}" + clazz.getName());
 					} catch (Exception e) {
-						BanStick.getPlugin().info("Failed to initialize a scraper worker of type {0}", clazz.getName());
-						BanStick.getPlugin().warning("  Failure message: ", e.getMessage());
+						BanStick.getPlugin().getLogger().info("Failed to initialize a scraper worker of type " + clazz.getName());
+						BanStick.getPlugin().getLogger().warning("  Failure message: " + e.getMessage());
 					}
 
 
 					if (loader != null) {
 						try {
-							BukkitTask task = Bukkit.getScheduler().runTaskLaterAsynchronously(BanStick.getPlugin(), loader, loader.getDelay());
+							BukkitTask task = Bukkit.getScheduler().runTaskLaterAsynchronously(BanStick.getPlugin().getLogger(), loader, loader.getDelay());
 							loader.setTask(task);
 						} catch (Exception e) {
-							BanStick.getPlugin().warning("Failed to activate scraper worker of type {0}", clazz.getName());
-							BanStick.getPlugin().warning("  Failure message: ", e);
+							BanStick.getPlugin().getLogger().warning("Failed to activate scraper worker of type {0}", clazz.getName());
+							BanStick.getPlugin().getLogger().warning("  Failure message: ", e);
 						}
 					}
 				}
 			}
 		} catch (IOException ioe) {
-			BanStick.getPlugin().warning("Failed to load any scraper workers, due to IO error", ioe);
+			BanStick.getPlugin().getLogger().warning("Failed to load any scraper workers, due to IO error" + ioe);
 		}
 	}
 	

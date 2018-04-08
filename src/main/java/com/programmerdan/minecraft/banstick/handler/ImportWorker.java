@@ -1,23 +1,23 @@
 package com.programmerdan.minecraft.banstick.handler;
 
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.scheduler.BukkitTask;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
+import net.md_5.bungee.config.Configuration;
 
 public abstract class ImportWorker implements Runnable {
 
-	private BukkitTask importTask = null;
+	private ScheduledTask importTask = null;
 	private long delay = 100l;
 	private boolean enable = false;
 	
-	public ImportWorker(ConfigurationSection config) {
-		if (config != null && setup(config.getConfigurationSection(name()))) {
-			enable = internalSetup(config.getConfigurationSection(name()));
+	public ImportWorker(Configuration config) {
+		if (config != null && setup(config.getSection(name()))) {
+			enable = internalSetup(config.getSection(name()));
 		} else {
 			enable = false;
 		}
 	}
 	
-	private boolean setup(ConfigurationSection config) {
+	private boolean setup(Configuration config) {
 		if (config == null) return false;
 		delay = config.getLong("delay", delay);
 		return config.getBoolean("enable", enable);
@@ -30,7 +30,7 @@ public abstract class ImportWorker implements Runnable {
 		}
 	}
 	
-	public abstract boolean internalSetup(ConfigurationSection config);
+	public abstract boolean internalSetup(Configuration config);
 	public abstract void doImport();
 	public abstract String name();
 
@@ -38,7 +38,7 @@ public abstract class ImportWorker implements Runnable {
 		return 0;
 	}
 
-	public void setTask(BukkitTask task) {
+	public void setTask(ScheduledTask task) {
 		importTask = task;
 	}
 

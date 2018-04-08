@@ -70,11 +70,11 @@ public class BSSessions {
 					sessionList.add(rs.getLong(1));
 				}
 				if (sessionList.size() == 0) {
-					BanStick.getPlugin().warning("No Sessions for " + forPlayer.getName());
+					BanStick.getPlugin().getLogger().warning("No Sessions for " + forPlayer.getName());
 				}
 			}
 		} catch (SQLException se) {
-			BanStick.getPlugin().severe("Failed to get list of Session ids", se);
+			BanStick.getPlugin().getLogger().severe("Failed to get list of Session ids" + se);
 		}
 	}
 
@@ -98,7 +98,7 @@ public class BSSessions {
 		if (session != null) {
 			session.setLeaveTime(sessionEnd);
 		} else {
-			BanStick.getPlugin().warning("Call to end a session, but no active session: " + forPlayer.getId());
+			BanStick.getPlugin().getLogger().warning("Call to end a session, but no active session: " + forPlayer.getId());
 		}
 	}
 }

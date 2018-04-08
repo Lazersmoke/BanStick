@@ -15,12 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scheduler.BukkitRunnable;
+import java.lang.Runnable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,6 +25,9 @@ import com.programmerdan.minecraft.banstick.data.BSIPData;
 
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
+
+import net.md_5.bungee.config.Configuration;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 
 /**
  * This class deals with scheduling a constrained lookup / update of data from IP data reporting service(s).
@@ -41,8 +39,8 @@ import inet.ipaddr.IPAddressString;
  * @author ProgrammerDan
  *
  */
-public class BanStickIPDataHandler extends BukkitRunnable {
-	private BukkitTask selfTask;
+public class BanStickIPDataHandler implements Runnable {
+	private ScheduledTask selfTask;
 	private ConcurrentLinkedQueue<WeakReference<BSIP>> toCheck = null;
 	private boolean enabled = false;
 	
@@ -54,15 +52,15 @@ public class BanStickIPDataHandler extends BukkitRunnable {
 	
 	private final String target = "http://ip-api.com/batch";
 	
-	public BanStickIPDataHandler(FileConfiguration config) {
-		if (!configure(config.getConfigurationSection("iplookup"))) {
-			BanStick.getPlugin().warning("IP Data lookup is disabled. This will reduce the quality of information on player's connections.");
+	public BanStickIPDataHandler(Configuration config) {
+		if (!configure(config.getSection("iplookup"))) {
+			BanStick.getPlugin().getLogger().warning("IP Data lookup is disabled. This will reduce the quality of information on player's connections.");
 			return;
 		}
 		
 		begin();
 	}
-	private boolean configure(ConfigurationSection config) {
+	private boolean configure(Configuration config) {
 		if (config != null && config.getBoolean("enable", false)) {
 			enabled = true;
 		} else {
@@ -83,8 +81,8 @@ public class BanStickIPDataHandler extends BukkitRunnable {
 	private void begin() {
 		if (enabled) {
 			currentFailures = 0;
-			selfTask = this.runTaskTimerAsynchronously(BanStick.getPlugin(), period, period);
-			BanStick.getPlugin().warning("Dynamic IP Data lookup task started.");
+			selfTask = BanStick.getPlugin().getProxy().getScheduler().schedule(BanStick.getPlugin(), this, period * 50, period * 50, java.util.concurrent.TimeUnit.MILLISECONDS);
+			BanStick.getPlugin().getLogger().warning("Dynamic IP Data lookup task started.");
 		}
 	}
 	
@@ -106,16 +104,16 @@ public class BanStickIPDataHandler extends BukkitRunnable {
 		if (disableOnFailures <= currentFailures) {
 			enabled = false;
 			if (this.cooldownToReenable > 0) {
-				BanStick.getPlugin().severe("Too many failures; temporarily disabling BanStickIPData updater.");
-				Bukkit.getScheduler().runTaskLater(BanStick.getPlugin(), new Runnable() {
+				BanStick.getPlugin().getLogger().severe("Too many failures; temporarily disabling BanStickIPData updater.");
+				BanStick.getPlugin().getProxy().getScheduler().schedule(BanStick.getPlugin(), new Runnable() {
 					@Override
 					public void run() {
 						currentFailures = 0;
 						enabled = true;
 					}
-				}, this.cooldownToReenable);
+				}, this.cooldownToReenable * 50, java.util.concurrent.TimeUnit.MILLISECONDS);
 			} else {
-				BanStick.getPlugin().severe("Too many failures; permanently disabling BanStickIPData updater.");
+				BanStick.getPlugin().getLogger().severe("Too many failures; permanently disabling BanStickIPData updater.");
 				selfTask.cancel();
 			}
 			return;
@@ -153,7 +151,7 @@ public class BanStickIPDataHandler extends BukkitRunnable {
 			GsonBuilder builder = new com.google.gson.GsonBuilder();
 			Gson gson = builder.create();
 			String data = gson.toJson(source);
-			BanStick.getPlugin().debug("Requesting data from ip-data: {0}", data);
+			BanStick.getPlugin().getLogger().warning("Requesting data from ip-data: " + data);
 			byte[] dataPrep = data.getBytes(StandardCharsets.UTF_8);
 			
 			URL url = new URL(target);
@@ -172,14 +170,14 @@ public class BanStickIPDataHandler extends BukkitRunnable {
 				replies = gson.fromJson(dataReply, IpData[].class);
 			}
 			if (replies == null || replies.length == 0) {
-				BanStick.getPlugin().warning("IPData periodic batch updater failure, no data received");
+				BanStick.getPlugin().getLogger().warning("IPData periodic batch updater failure, no data received");
 				currentFailures ++;
 				return;
 			}
 			
 			for (IpData reply : replies) {
 				if (reply.getMessage() != null) {
-					BanStick.getPlugin().debug("Failure during IPData lookup for {0}: {1}", reply.getQuery(), reply.getMessage());
+					BanStick.getPlugin().getLogger().warning("Failure during IPData lookup for " + reply.getQuery() + ": " + reply.getMessage());
 					continue;
 				}
 				IPAddressString replyAddress = new IPAddressString(reply.getQuery());
@@ -215,13 +213,13 @@ public class BanStickIPDataHandler extends BukkitRunnable {
 			}
 		} catch (MalformedURLException mue) {
 			enabled = false;
-			BanStick.getPlugin().severe("Failed to connect to malformed IPData check url", mue);
+			BanStick.getPlugin().getLogger().severe("Failed to connect to malformed IPData check url" + mue);
 		} catch (IOException ioe) {
 			currentFailures ++;
-			BanStick.getPlugin().warning("IO Error on IPData update: ", ioe);
+			BanStick.getPlugin().getLogger().warning("IO Error on IPData update: " + ioe);
 		} catch (ClassCastException cce) {
 			enabled = false;
-			BanStick.getPlugin().severe("Failed to identify connection as http; perm failure", cce);
+			BanStick.getPlugin().getLogger().severe("Failed to identify connection as http; perm failure" + cce);
 		}
 	}
 	

@@ -1,12 +1,13 @@
 package com.programmerdan.minecraft.banstick.commands;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.CommandSender;
+
+import net.md_5.bungee.config.Configuration;
 
 import com.programmerdan.minecraft.banstick.BanStick;
 
-public class BanSaveCommand  implements CommandExecutor{
+public class BanSaveCommand extends Command {
 
 	public static String name = "bansave";
 		

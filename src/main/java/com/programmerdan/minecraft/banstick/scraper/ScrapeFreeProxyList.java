@@ -8,7 +8,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.jsoup.nodes.Element;
-import org.bukkit.configuration.ConfigurationSection;
 
 import com.programmerdan.minecraft.banstick.BanStick;
 import com.programmerdan.minecraft.banstick.data.BSBan;
@@ -33,12 +32,12 @@ public class ScrapeFreeProxyList extends ScraperWorker {
 			"http://www.socks-proxy.net/",
 			"http://free-proxy-list.net/anonymous-proxy.html"
 	};
-	public ScrapeFreeProxyList(ConfigurationSection config) {
+	public ScrapeFreeProxyList(Configuration config) {
 		super(config);
 	}
 
 	@Override
-	public void setup(ConfigurationSection config) {
+	public void setup(Configuration config) {
 		banMessage = config.getString("ban.message");
 		banLength = config.getLong("ban.length");
 	}
@@ -57,13 +56,13 @@ public class ScrapeFreeProxyList extends ScraperWorker {
 	
 	public void scrapeOne(String url) {
 		try {
-			BanStick.getPlugin().debug("Scraping {0}", url);
+			BanStick.getPlugin().getLogger().warning("Scraping " + url);
 			Document doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0").get();
 			Elements iptable = doc.select("table#proxylisttable");
 			
 			Elements body = iptable.select("tbody");
 			Elements trs = body.select("tr");
-			BanStick.getPlugin().debug("Found {0} proxy IPs to scrape", trs.size());
+			BanStick.getPlugin().getLogger().warning("Found " + trs.size() + " proxy IPs to scrape");
 			for(Element tr : trs) {
 				Elements tds = tr.select("td");
 				String IP = null;
@@ -119,7 +118,7 @@ public class ScrapeFreeProxyList extends ScraperWorker {
 				}
 			}
 		} catch (IOException ioe) {
-			BanStick.getPlugin().warning("Failure during scrape of " + url, ioe);
+			BanStick.getPlugin().getLogger().warning("Failure during scrape of " + url + ioe);
 			this.registerError();
 		}
 	}

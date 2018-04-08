@@ -11,9 +11,9 @@ import com.programmerdan.minecraft.banstick.handler.BanStickProxyHandler;
 import com.programmerdan.minecraft.banstick.handler.BanStickScrapeHandler;
 import com.programmerdan.minecraft.banstick.handler.BanStickTorUpdater;
 
-import vg.civcraft.mc.civmodcore.ACivMod;
+import net.md_5.bungee.api.plugin.Plugin;
 
-public class BanStick extends ACivMod {
+public class BanStick extends Plugin {
 	private static BanStick instance;
 	private BanStickCommandHandler commandHandler;
 	private BanStickEventHandler eventHandler;
